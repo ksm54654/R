@@ -1,0 +1,61 @@
+---
+  title: "Titanic - Machine Learning from Disaster"
+  author: 김은빈(이메일)
+  date: "`r format(Sys.Date())`" 
+  output:
+    pdf_document:
+    extra_dependencies: ["kotex"]
+    fig_height: 6
+    fig_width: 10
+    toc: yes
+    toc_depth: 3
+  html_document:
+    fig_height: 6
+    fig_width: 10
+    highlight: textmate
+    theme: cosmo
+    toc: yes
+    toc_depth: 3
+    toc_float: yes    
+  word_document:
+    fig_height: 6
+    fig_width: 10
+    toc: yes
+---
+  
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=T, message=F, warning=F, fig.height = 8, cache=T, dpi = 300, dev = "png")
+library(tidyverse)
+library(tidymodels)
+library(mice)
+```
+
+
+## 1. 데이터 불러오기
+```{r}
+df_titanic <- 
+  read.csv("data/titanic_train.csv") %>%
+  rename_all(tolower)
+df_titanic_test <-
+  read.csv("data/titanic_test.csv") %>%
+  rename_all(tolower)
+
+summary(df_titanic)
+```
+## 2. 시각화를 통한 데이터 확인
+
+df_titanic %>%
+  group_by(survived) %>%
+  summarise(mean_age = mean(age, na.rm = T),
+            min_age = min(age, na.rm = T),
+            max_age = max(age, na.rm = T))
+
+df_titanic %>%
+  mutate(age_group = ifelse(age < 15, "Children", ifelse(age >= 15 & age <= 64, "Working-age", "Elderly"))) %>%
+  filter(!is.na(age_group)) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = factor(age_group, level = c("Children", "Working-age", "Elderly")),
+                         fill = factor(survived)), position = "dodge") +
+  labs(x = "age_group")
+  
